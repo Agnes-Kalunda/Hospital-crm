@@ -18,10 +18,15 @@ from django.urls import path , include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('auth/', include('authentication.urls')),
-    path('patients/', include('patients.urls')),
-    path('doctors/', include('doctors.urls')),
-    path('appointments/', include('appointments.urls')),
-    path('records/', include('records.urls')),
-    path('notifications/', include('notifications.urls')),
+    path('api/auth/', include('authentication.urls')),
+    path('api/patients/', include('patients.urls')),
+    path('api/doctors/', include('doctors.urls')),
+    path('api/appointments/', include('appointments.urls')),
+    path('api/records/', include('records.urls')),
+    path('api/notifications/', include('notifications.urls')),
+    
+    
+    # path('docs/', include_docs_urls(title='Healthcare API')),
+    # path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+    # path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
 ]

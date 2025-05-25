@@ -47,6 +47,8 @@ INSTALLED_APPS = [
     'appointments',
     'records',
     'notifications',
+    
+    'rest_framework'
 ]
 
 
