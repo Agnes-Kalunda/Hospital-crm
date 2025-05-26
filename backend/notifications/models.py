@@ -24,5 +24,9 @@ class Notification(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     sent_at = models.DateTimeField(null=True, blank=True)
     
+    class Meta:
+        db_table = 'notifications'
+        ordering = ['-created_at']
+        
     def __str__(self):
         return f"{self.get_notification_type_display()} for {self.patient}"
