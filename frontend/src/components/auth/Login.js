@@ -1,5 +1,6 @@
+
 import React, { useState, useContext, useEffect } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
 
 const Login = () => {
@@ -15,7 +16,7 @@ const Login = () => {
   const location = useLocation();
   
   useEffect(() => {
-
+    
     if (token) {
       navigate('/');
     }
@@ -35,7 +36,7 @@ const Login = () => {
     try {
       const success = await login(username, password);
       if (success) {
-
+      
         const from = location.state?.from?.pathname || '/';
         navigate(from);
       } else {
@@ -92,20 +93,15 @@ const Login = () => {
           <div>
             <button
               type="submit"
-              className="group relative w-full flex justify-center btn btn-primary"
+              className="btn btn-primary w-full"
               disabled={loading}
             >
               {loading ? 'Signing in...' : 'Sign in'}
             </button>
           </div>
-          
-          <div className="text-center text-sm text-gray-600">
-            <span>Don't have an account? </span>
-            <Link to="/register" className="font-medium text-primary-600 hover:text-primary-500">
-              Register
-            </Link>
-          </div>
         </form>
+        
+      
       </div>
     </div>
   );

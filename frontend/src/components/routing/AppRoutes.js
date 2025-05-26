@@ -9,7 +9,7 @@ import PrivateRoute from './PrivateRoute';
 
 // Auth 
 import Login from '../auth/Login';
-import Register from '../auth/Register';
+// import Register from '../auth/Register';
 import Dashboard from '../Dashboard';
 
 // Patient
@@ -51,7 +51,7 @@ const AppRoutes = () => {
             <Routes>
               {/* Auth Routes */}
               <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
+              
               
               {/* Dashboard */}
               <Route path="/" element={
