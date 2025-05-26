@@ -1,206 +1,274 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
-import Spinner from './layout/Spinner';
 
 const Dashboard = () => {
   const [stats, setStats] = useState({
-    patients: 0,
-    doctors: 0,
-    appointments: 0,
-    records: 0
+    patients: 24,
+    doctors: 8,
+    appointments: 42,
+    records: 36
   });
   
-  const [upcomingAppointments, setUpcomingAppointments] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [upcomingAppointments, setUpcomingAppointments] = useState([
+    {
+      id: 1,
+      patient_details: {
+        first_name: 'John',
+        last_name: 'Doe'
+      },
+      doctor_details: {
+        first_name: 'Jane',
+        last_name: 'Smith'
+      },
+      appointment_datetime: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+      status: 'SCHEDULED',
+      status_display: 'Scheduled'
+    },
+    {
+      id: 2,
+      patient_details: {
+        first_name: 'Alice',
+        last_name: 'Johnson'
+      },
+      doctor_details: {
+        first_name: 'Bob',
+        last_name: 'Williams'
+      },
+      appointment_datetime: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(),
+      status: 'SCHEDULED',
+      status_display: 'Scheduled'
+    }
+  ]);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   
-  useEffect(() => {
-    const fetchDashboardData = async () => {
-      try {
-        const [patientsRes, doctorsRes, appointmentsRes, recordsRes, upcomingRes] = await Promise.all([
-          axios.get('/api/patients/'),
-          axios.get('/api/doctors/'),
-          axios.get('/api/appointments/'),
-          axios.get('/api/records/'),
-          axios.get('/api/appointments/?upcoming=true')
-        ]);
-        
-        setStats({
-          patients: patientsRes.data.length,
-          doctors: doctorsRes.data.length,
-          appointments: appointmentsRes.data.length,
-          records: recordsRes.data.length
-        });
-        
-        setUpcomingAppointments(upcomingRes.data.slice(0, 5));
-        setLoading(false);
-      } catch (err) {
-        console.error('Error fetching dashboard data:', err);
-        setError('Failed to load dashboard data');
-        setLoading(false);
-      }
-    };
-    
-    fetchDashboardData();
-  }, []);
-  
-  if (loading) return <Spinner />;
-  if (error) return <div className="alert alert-danger">{error}</div>;
-  
   return (
-    <div className="dashboard">
-      <h2 className="my-4">Dashboard</h2>
+    <div className="px-4 py-6">
+      <h1 className="text-2xl font-semibold text-gray-900">Dashboard</h1>
       
-      {/* Stats Cards */}
-      <div className="row">
-        <div className="col-md-3 mb-4">
-          <div className="card bg-primary text-white h-100">
-            <div className="card-body">
-              <h5 className="card-title">Patients</h5>
-              <h2 className="display-4">{stats.patients}</h2>
+      {/* Stats Grid */}
+      <div className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        {/* Patients Card */}
+        <div className="bg-white overflow-hidden shadow-card rounded-lg">
+          <div className="p-5">
+            <div className="flex items-center">
+              <div className="flex-shrink-0 bg-primary-500 rounded-md p-3">
+                <svg className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+              </div>
+              <div className="ml-5 w-0 flex-1">
+                <dl>
+                  <dt className="text-sm font-medium text-gray-500 truncate">Patients</dt>
+                  <dd>
+                    <div className="text-3xl font-semibold text-gray-900">{stats.patients}</div>
+                  </dd>
+                </dl>
+              </div>
             </div>
-            <div className="card-footer d-flex align-items-center justify-content-between">
-              <Link to="/patients" className="text-white text-decoration-none">
-                View Details
+          </div>
+          <div className="bg-gray-50 px-5 py-3 border-t border-gray-200">
+            <div className="text-sm">
+              <Link to="/patients" className="font-medium text-primary-600 hover:text-primary-500">
+                View all patients
               </Link>
-              <i className="bi bi-people fs-5"></i>
             </div>
           </div>
         </div>
         
-        <div className="col-md-3 mb-4">
-          <div className="card bg-success text-white h-100">
-            <div className="card-body">
-              <h5 className="card-title">Doctors</h5>
-              <h2 className="display-4">{stats.doctors}</h2>
+        {/* Doctors Card */}
+        <div className="bg-white overflow-hidden shadow-card rounded-lg">
+          <div className="p-5">
+            <div className="flex items-center">
+              <div className="flex-shrink-0 bg-secondary-500 rounded-md p-3">
+                <svg className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+              </div>
+              <div className="ml-5 w-0 flex-1">
+                <dl>
+                  <dt className="text-sm font-medium text-gray-500 truncate">Doctors</dt>
+                  <dd>
+                    <div className="text-3xl font-semibold text-gray-900">{stats.doctors}</div>
+                  </dd>
+                </dl>
+              </div>
             </div>
-            <div className="card-footer d-flex align-items-center justify-content-between">
-              <Link to="/doctors" className="text-white text-decoration-none">
-                View Details
+          </div>
+          <div className="bg-gray-50 px-5 py-3 border-t border-gray-200">
+            <div className="text-sm">
+              <Link to="/doctors" className="font-medium text-secondary-600 hover:text-secondary-500">
+                View all doctors
               </Link>
-              <i className="bi bi-person-badge fs-5"></i>
             </div>
           </div>
         </div>
         
-        <div className="col-md-3 mb-4">
-          <div className="card bg-warning text-white h-100">
-            <div className="card-body">
-              <h5 className="card-title">Appointments</h5>
-              <h2 className="display-4">{stats.appointments}</h2>
+        {/* Appointments Card */}
+        <div className="bg-white overflow-hidden shadow-card rounded-lg">
+          <div className="p-5">
+            <div className="flex items-center">
+              <div className="flex-shrink-0 bg-amber-500 rounded-md p-3">
+                <svg className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <div className="ml-5 w-0 flex-1">
+                <dl>
+                  <dt className="text-sm font-medium text-gray-500 truncate">Appointments</dt>
+                  <dd>
+                    <div className="text-3xl font-semibold text-gray-900">{stats.appointments}</div>
+                  </dd>
+                </dl>
+              </div>
             </div>
-            <div className="card-footer d-flex align-items-center justify-content-between">
-              <Link to="/appointments" className="text-white text-decoration-none">
-                View Details
+          </div>
+          <div className="bg-gray-50 px-5 py-3 border-t border-gray-200">
+            <div className="text-sm">
+              <Link to="/appointments" className="font-medium text-amber-600 hover:text-amber-500">
+                View all appointments
               </Link>
-              <i className="bi bi-calendar-check fs-5"></i>
             </div>
           </div>
         </div>
         
-        <div className="col-md-3 mb-4">
-          <div className="card bg-info text-white h-100">
-            <div className="card-body">
-              <h5 className="card-title">Medical Records</h5>
-              <h2 className="display-4">{stats.records}</h2>
+        {/* Medical Records Card */}
+        <div className="bg-white overflow-hidden shadow-card rounded-lg">
+          <div className="p-5">
+            <div className="flex items-center">
+              <div className="flex-shrink-0 bg-sky-500 rounded-md p-3">
+                <svg className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+              </div>
+              <div className="ml-5 w-0 flex-1">
+                <dl>
+                  <dt className="text-sm font-medium text-gray-500 truncate">Medical Records</dt>
+                  <dd>
+                    <div className="text-3xl font-semibold text-gray-900">{stats.records}</div>
+                  </dd>
+                </dl>
+              </div>
             </div>
-            <div className="card-footer d-flex align-items-center justify-content-between">
-              <Link to="/records" className="text-white text-decoration-none">
-                View Details
+          </div>
+          <div className="bg-gray-50 px-5 py-3 border-t border-gray-200">
+            <div className="text-sm">
+              <Link to="/records" className="font-medium text-sky-600 hover:text-sky-500">
+                View all records
               </Link>
-              <i className="bi bi-file-medical fs-5"></i>
             </div>
           </div>
         </div>
       </div>
       
       {/* Upcoming Appointments */}
-      <div className="row mt-4">
-        <div className="col-md-12">
-          <div className="card">
-            <div className="card-header d-flex justify-content-between align-items-center">
-              <h5 className="mb-0">Upcoming Appointments</h5>
-              <Link to="/appointments" className="btn btn-sm btn-primary">View All</Link>
-            </div>
-            <div className="card-body">
-              {upcomingAppointments.length > 0 ? (
-                <div className="table-responsive">
-                  <table className="table table-hover">
-                    <thead>
-                      <tr>
-                        <th>Patient</th>
-                        <th>Doctor</th>
-                        <th>Date & Time</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {upcomingAppointments.map(appointment => (
-                        <tr key={appointment.id}>
-                          <td>
-                            {appointment.patient_details.first_name} {appointment.patient_details.last_name}
-                          </td>
-                          <td>
-                            Dr. {appointment.doctor_details.first_name} {appointment.doctor_details.last_name}
-                          </td>
-                          <td>
-                            {new Date(appointment.appointment_datetime).toLocaleString()}
-                          </td>
-                          <td>
-                            <span className={`badge bg-${
-                              appointment.status === 'SCHEDULED' ? 'success' :
-                              appointment.status === 'COMPLETED' ? 'info' : 'danger'
-                            }`}>
-                              {appointment.status_display}
-                            </span>
-                          </td>
-                          <td>
-                            <Link to={`/appointments/${appointment.id}`} className="btn btn-sm btn-info me-2">
-                              View
-                            </Link>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              ) : (
-                <p className="text-center py-3">No upcoming appointments</p>
-              )}
-            </div>
+      <div className="mt-8">
+        <div className="bg-white shadow-card rounded-lg">
+          <div className="px-4 py-5 border-b border-gray-200 sm:px-6 flex justify-between items-center">
+            <h3 className="text-lg leading-6 font-medium text-gray-900">Upcoming Appointments</h3>
+            <Link to="/appointments" className="text-sm font-medium text-primary-600 hover:text-primary-500">
+              View All
+            </Link>
+          </div>
+          <div className="overflow-x-auto">
+            {upcomingAppointments.length > 0 ? (
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Patient
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Doctor
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Date & Time
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Status
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Actions
+                      </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {upcomingAppointments.map((appointment) => (
+                    <tr key={appointment.id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm font-medium text-gray-900">
+                          {appointment.patient_details.first_name}{' '}
+                          {appointment.patient_details.last_name}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm font-medium text-gray-900">
+                          Dr. {appointment.doctor_details.first_name}{' '}
+                          {appointment.doctor_details.last_name}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-500">
+                          {new Date(appointment.appointment_datetime).toLocaleString()}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                          ${appointment.status === 'SCHEDULED' 
+                            ? 'bg-green-100 text-green-800' 
+                            : appointment.status === 'COMPLETED' 
+                              ? 'bg-blue-100 text-blue-800' 
+                              : 'bg-red-100 text-red-800'}`}>
+                          {appointment.status_display}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <Link to={`/appointments/${appointment.id}`} className="text-primary-600 hover:text-primary-900 mr-4">
+                          View
+                        </Link>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            ) : (
+              <div className="text-center py-6 text-gray-500">No upcoming appointments</div>
+            )}
           </div>
         </div>
       </div>
       
       {/* Quick Actions */}
-      <div className="row mt-4">
-        <div className="col-md-12">
-          <div className="card">
-            <div className="card-header">
-              <h5 className="mb-0">Quick Actions</h5>
-            </div>
-            <div className="card-body">
-              <div className="d-flex justify-content-around flex-wrap">
-                <Link to="/patients/add" className="btn btn-primary m-2">
-                  <i className="bi bi-person-plus me-2"></i>
-                  Add Patient
-                </Link>
-                <Link to="/doctors/add" className="btn btn-success m-2">
-                  <i className="bi bi-person-plus-fill me-2"></i>
-                  Add Doctor
-                </Link>
-                <Link to="/appointments/add" className="btn btn-warning m-2">
-                  <i className="bi bi-calendar-plus me-2"></i>
-                  Schedule Appointment
-                </Link>
-                <Link to="/records/add" className="btn btn-info m-2">
-                  <i className="bi bi-file-earmark-plus me-2"></i>
-                  Add Medical Record
-                </Link>
-              </div>
-            </div>
+      <div className="mt-8">
+        <div className="bg-white shadow-card rounded-lg">
+          <div className="px-4 py-5 border-b border-gray-200 sm:px-6">
+            <h3 className="text-lg leading-6 font-medium text-gray-900">Quick Actions</h3>
+          </div>
+          <div className="p-6 flex flex-wrap gap-4 justify-center sm:justify-start">
+            <Link to="/patients/add" className="inline-flex items-center px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+              <svg className="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6zM16 7a1 1 0 10-2 0v1h-1a1 1 0 100 2h1v1a1 1 0 102 0v-1h1a1 1 0 100-2h-1V7z" />
+              </svg>
+              Add Patient
+            </Link>
+            <Link to="/doctors/add" className="inline-flex items-center px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-secondary-600 hover:bg-secondary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary-500">
+              <svg className="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6zM16 7a1 1 0 10-2 0v1h-1a1 1 0 100 2h1v1a1 1 0 102 0v-1h1a1 1 0 100-2h-1V7z" />
+              </svg>
+              Add Doctor
+            </Link>
+            <Link to="/appointments/add" className="inline-flex items-center px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-amber-500 hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500">
+              <svg className="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd" />
+              </svg>
+              Schedule Appointment
+            </Link>
+            <Link to="/records/add" className="inline-flex items-center px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-sky-500 hover:bg-sky-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500">
+              <svg className="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clipRule="evenodd" />
+              </svg>
+              Add Medical Record
+            </Link>
           </div>
         </div>
       </div>

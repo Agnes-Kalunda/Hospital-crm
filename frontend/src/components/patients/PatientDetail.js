@@ -1,0 +1,271 @@
+import React, { useState, useEffect } from 'react';
+import { Link, useParams, useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import Spinner from '../layout/Spinner';
+import { toast } from 'react-toastify';
+
+const PatientDetail = () => {
+  const [patient, setPatient] = useState(null);
+  const [appointments, setAppointments] = useState([]);
+  const [records, setRecords] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [activeTab, setActiveTab] = useState('details');
+  
+  const { id } = useParams();
+  const navigate = useNavigate();
+  
+  useEffect(() => {
+    const fetchPatientData = async () => {
+      try {
+        const [patientRes, appointmentsRes, recordsRes] = await Promise.all([
+          axios.get(`/api/patients/${id}/`),
+          axios.get(`/api/appointments/?patient=${id}`),
+          axios.get(`/api/records/?patient=${id}`)
+        ]);
+        
+        setPatient(patientRes.data);
+        setAppointments(appointmentsRes.data);
+        setRecords(recordsRes.data);
+        setLoading(false);
+      } catch (err) {
+        console.error('Error fetching patient data:', err);
+        setError('Failed to load patient data');
+        setLoading(false);
+      }
+    };
+    
+    fetchPatientData();
+  }, [id]);
+  
+  const handleDelete = async () => {
+    if (window.confirm('Are you sure you want to delete this patient? This action cannot be undone.')) {
+      try {
+        await axios.delete(`/api/patients/${id}/`);
+        toast.success('Patient deleted successfully');
+        navigate('/patients');
+      } catch (err) {
+        console.error('Error deleting patient:', err);
+        toast.error('Failed to delete patient');
+      }
+    }
+  };
+  
+  if (loading) return <Spinner />;
+  if (error) return <div className="alert alert-danger">{error}</div>;
+  if (!patient) return <div className="alert alert-warning">Patient not found</div>;
+  
+  return (
+    <div>
+      <div className="d-flex justify-content-between align-items-center mb-4">
+        <h2>{patient.first_name} {patient.last_name}</h2>
+        <div>
+          <Link to={`/patients/${id}/edit`} className="btn btn-warning me-2">
+            <i className="bi bi-pencil me-1"></i> Edit
+          </Link>
+          <Link to={`/appointments/add?patient=${id}`} className="btn btn-success me-2">
+            <i className="bi bi-calendar-plus me-1"></i> Schedule Appointment
+          </Link>
+          <button className="btn btn-danger" onClick={handleDelete}>
+            <i className="bi bi-trash me-1"></i> Delete
+          </button>
+        </div>
+      </div>
+      
+      <div className="card">
+        <div className="card-header">
+          <ul className="nav nav-tabs card-header-tabs">
+            <li className="nav-item">
+              <button 
+                className={`nav-link ${activeTab === 'details' ? 'active' : ''}`}
+                onClick={() => setActiveTab('details')}
+              >
+                Details
+              </button>
+            </li>
+            <li className="nav-item">
+              <button 
+                className={`nav-link ${activeTab === 'appointments' ? 'active' : ''}`}
+                onClick={() => setActiveTab('appointments')}
+              >
+                Appointments
+              </button>
+            </li>
+            <li className="nav-item">
+              <button 
+                className={`nav-link ${activeTab === 'records' ? 'active' : ''}`}
+                onClick={() => setActiveTab('records')}
+              >
+                Medical Records
+              </button>
+            </li>
+          </ul>
+        </div>
+        <div className="card-body">
+          {activeTab === 'details' && (
+            <div className="row">
+              <div className="col-md-6">
+                <h5>Personal Information</h5>
+                <table className="table">
+                  <tbody>
+                    <tr>
+                      <th style={{ width: '30%' }}>Full Name</th>
+                      <td>{patient.first_name} {patient.last_name}</td>
+                    </tr>
+                    <tr>
+                      <th>Date of Birth</th>
+                      <td>{new Date(patient.date_of_birth).toLocaleDateString()}</td>
+                    </tr>
+                    <tr>
+                      <th>Email</th>
+                      <td>{patient.email}</td>
+                    </tr>
+                    <tr>
+                      <th>Phone</th>
+                      <td>{patient.phone || 'N/A'}</td>
+                    </tr>
+                    <tr>
+                      <th>Address</th>
+                      <td>{patient.address || 'N/A'}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div className="col-md-6">
+                <h5>Insurance Information</h5>
+                <table className="table">
+                  <tbody>
+                    <tr>
+                      <th style={{ width: '30%' }}>Provider</th>
+                      <td>{patient.insurance_provider || 'N/A'}</td>
+                    </tr>
+                    <tr>
+                      <th>Insurance ID</th>
+                      <td>{patient.insurance_id || 'N/A'}</td>
+                    </tr>
+                  </tbody>
+                </table>
+                
+                <h5 className="mt-4">Medical History</h5>
+                <div className="p-3 bg-light rounded">
+                  {patient.medical_history ? (
+                    <p className="mb-0">{patient.medical_history}</p>
+                  ) : (
+                    <p className="text-muted mb-0">No medical history recorded</p>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+          
+          {activeTab === 'appointments' && (
+            <div>
+              <div className="d-flex justify-content-between align-items-center mb-3">
+                <h5 className="mb-0">Appointments</h5>
+                <Link to={`/appointments/add?patient=${id}`} className="btn btn-sm btn-success">
+                  <i className="bi bi-calendar-plus me-1"></i> Add Appointment
+                </Link>
+              </div>
+              
+              {appointments.length > 0 ? (
+                <div className="table-responsive">
+                  <table className="table table-hover">
+                    <thead>
+                      <tr>
+                        <th>Doctor</th>
+                        <th>Date & Time</th>
+                        <th>Status</th>
+                        <th>Reason</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {appointments.map(appointment => (
+                        <tr key={appointment.id}>
+                          <td>
+                            Dr. {appointment.doctor_details.first_name} {appointment.doctor_details.last_name}
+                          </td>
+                          <td>
+                            {new Date(appointment.appointment_datetime).toLocaleString()}
+                          </td>
+                          <td>
+                            <span className={`badge bg-${
+                              appointment.status === 'SCHEDULED' ? 'success' :
+                              appointment.status === 'COMPLETED' ? 'info' : 'danger'
+                            }`}>
+                              {appointment.status_display}
+                            </span>
+                          </td>
+                          <td>{appointment.reason || 'N/A'}</td>
+                          <td>
+                            <Link to={`/appointments/${appointment.id}`} className="btn btn-sm btn-info me-2">
+                              <i className="bi bi-eye"></i>
+                            </Link>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <p className="text-center py-3">No appointments found</p>
+              )}
+            </div>
+          )}
+          
+          {activeTab === 'records' && (
+            <div>
+              <div className="d-flex justify-content-between align-items-center mb-3">
+                <h5 className="mb-0">Medical Records</h5>
+                <Link to={`/records/add?patient=${id}`} className="btn btn-sm btn-primary">
+                  <i className="bi bi-file-earmark-plus me-1"></i> Add Record
+                </Link>
+              </div>
+              
+              {records.length > 0 ? (
+                <div className="table-responsive">
+                  <table className="table table-hover">
+                    <thead>
+                      <tr>
+                        <th>Date</th>
+                        <th>Diagnosis</th>
+                        <th>Related to Appointment</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {records.map(record => (
+                        <tr key={record.id}>
+                          <td>{new Date(record.created_at).toLocaleDateString()}</td>
+                          <td>{record.diagnosis || 'N/A'}</td>
+                          <td>
+                            {record.appointment ? (
+                              <Link to={`/appointments/${record.appointment}`}>
+                                View Appointment
+                              </Link>
+                            ) : (
+                              'N/A'
+                            )}
+                          </td>
+                          <td>
+                            <Link to={`/records/${record.id}`} className="btn btn-sm btn-info me-2">
+                              <i className="bi bi-eye"></i>
+                            </Link>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <p className="text-center py-3">No medical records found</p>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default PatientDetail;
