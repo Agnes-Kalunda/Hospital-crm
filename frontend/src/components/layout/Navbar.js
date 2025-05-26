@@ -1,4 +1,3 @@
-
 import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
@@ -7,55 +6,42 @@ const Navbar = () => {
   const { user, logout, token } = useContext(AuthContext);
   
   return (
-    <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
-      <div className="container-fluid">
-        <Link className="navbar-brand" to="/">
-          Healthcare Scheduler
-        </Link>
-        <button
-          className="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarNav"
-          aria-controls="navbarNav"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
-        >
-          <span className="navbar-toggler-icon"></span>
-        </button>
-        <div className="collapse navbar-collapse" id="navbarNav">
-          {token ? (
-            <ul className="navbar-nav ms-auto">
-              <li className="nav-item dropdown">
-                
-                  className="nav-link dropdown-toggle"
-                  href="#"
-                  id="navbarDropdown"
-                  role="button"
-                  data-bs-toggle="dropdown"
-                  aria-expanded="false"
+    <nav className="bg-gray-800">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16">
+          <div className="flex items-center">
+            <div className="flex-shrink-0">
+              <Link to="/" className="text-white font-bold text-xl">
+                Healthcare Scheduler
+              </Link>
+            </div>
+          </div>
+          <div className="ml-4 flex items-center md:ml-6">
+            {token ? (
+              <div className="relative">
+                <div className="flex items-center">
+                  <span className="text-white mr-2">
+                    Welcome, {user?.first_name || 'User'}
+                  </span>
+                  <button
+                    onClick={logout}
+                    className="px-3 py-2 rounded-md text-sm font-medium text-white bg-red-600 hover:bg-red-700"
+                  >
+                    Logout
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="flex space-x-4">
+                <Link
+                  to="/login"
+                  className="px-3 py-2 rounded-md text-sm font-medium text-white hover:bg-gray-700"
                 >
-                  Welcome, {user?.first_name || 'User'}
-                </a>
-                <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                  <li>
-                    <a className="dropdown-item" href="#" onClick={logout}>
-                      Logout
-                    </a>
-                  </li>
-                </ul>
-              </li>
-            </ul>
-          ) : (
-            <ul className="navbar-nav ms-auto">
-              <li className="nav-item">
-                <Link className="nav-link" to="/login">
                   Login
                 </Link>
-              </li>
-              
-            </ul>
-          )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </nav>
