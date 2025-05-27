@@ -1,1 +1,321 @@
-# Hospital-crm
+## Overview
+
+This is a simple web application designed to manage doctor appointments, patient records, and medical information. The system allows staff to schedule appointments, track patient information, and manage doctor availability.
+
+## Technologies Used
+
+* *   **Backend**: Django 3.2 with Django REST Framework
+* *   **Authentication**: JWT (JSON Web Tokens) via SimpleJWT
+* *   **Database**: SQLite (development) / PostgreSQL (production)
+* *   **API Documentation**: Swagger/OpenAPI via drf-yasg
+* *   **Frontend**: React (with tailwind CSS)
+
+## Features
+
+* *   User authentication with role-based access control (Staff/Doctor)
+* *   Patient management
+* *   Doctor profiles and availability scheduling
+* *   Appointment booking with validation
+* *   Medical records tracking
+* *   Timezone-aware scheduling
+
+## Running the Project Locally
+
+### Prerequisites
+
+* *   Python 3.10+
+* *   Node.js 14+ (for frontend)
+* *   Git
+
+### Backend Setup
+
+1. 1.  **Clone the repository**
+
+bash
+
+```bash
+git clone <repository-url>
+cd hospital
+```
+
+1. 2.  **Set up a virtual environment**
+
+bash
+
+```bash
+cd backend
+python -m venv venv
+source venv/bin/activate 
+```
+
+1. 3.  **Install dependencies**
+
+bash
+
+```bash
+pip install -r requirements.txt
+```
+
+1. 4.  **Apply migrations**
+
+bash
+
+```bash
+python manage.py migrate
+```
+
+1. 5.  **Create a superuser**
+
+bash
+
+```bash
+python manage.py createsuperuser
+```
+
+1. 6.  **Run the development server**
+
+bash
+
+```bash
+python3 manage.py runserver
+```
+
+The backend will be available at [http://127.0.0.1:8000/](http://127.0.0.1:8000/)
+
+### Frontend Setup
+
+1. 1.  **Navigate to the frontend directory**
+
+bash
+
+```bash
+cd ../frontend
+```
+
+1. 2.  **Install dependencies**
+
+bash
+
+```bash
+npm install
+```
+
+1. 3.  **Start the development server**
+
+bash
+
+```bash
+npm start
+```
+
+The frontend will be available at [http://localhost:3000/](http://localhost:3000/)
+
+## API Documentation
+
+API documentation is available via Swagger UI when the backend server is running:
+
+* *   Swagger UI: [http://127.0.0.1:8000/swagger/](http://127.0.0.1:8000/swagger/)
+
+
+### Authentication
+
+The API uses JWT for authentication. To authenticate:
+
+1. 1.  Obtain a token by sending a POST request to `/api/auth/token/`:
+
+bash
+
+```bash
+curl -X POST http://127.0.0.1:8000/api/auth/token/ \
+  -H "Content-Type: application/json" \
+  -d '{"username":"your_username", "password":"your_password"}'
+```
+
+1. 2.  Use the returned access token in subsequent requests:
+
+bash
+
+```bash
+curl -X GET http://127.0.0.1:8000/api/patients/ \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+```
+
+1. 3.  Refresh tokens when they expire using `/api/auth/token/refresh/`:
+
+bash
+
+```bash
+curl -X POST http://127.0.0.1:8000/api/auth/token/refresh/ \
+  -H "Content-Type: application/json" \
+  -d '{"refresh":"YOUR_REFRESH_TOKEN"}'
+```
+
+### API Endpoints
+
+#### Authentication
+
+* *   `POST /api/auth/token/`: Obtain JWT token
+* *   `POST /api/auth/token/refresh/`: Refresh JWT token
+* *   `GET /api/auth/user/`: Get current user details
+
+#### Patients
+
+* *   `GET /api/patients/`: List all patients
+* *   `POST /api/patients/`: Create a new patient
+* *   `GET /api/patients/{id}/`: Retrieve a specific patient
+* *   `PUT /api/patients/{id}/`: Update a specific patient
+* *   `DELETE /api/patients/{id}/`: Delete a specific patient
+
+#### Doctors
+
+* *   `GET /api/doctors/`: List all doctors
+* *   `POST /api/doctors/`: Create a new doctor
+* *   `GET /api/doctors/{id}/`: Retrieve a specific doctor
+* *   `PUT /api/doctors/{id}/`: Update a specific doctor
+* *   `DELETE /api/doctors/{id}/`: Delete a specific doctor
+* *   `POST /api/doctors/{id}/add_availability/`: Add availability for a doctor
+* *   `DELETE /api/doctors/{id}/remove_availability/`: Remove availability for a doctor
+
+
+#### Appointments
+
+* *   `GET /api/appointments/`: List all appointments
+* *   `POST /api/appointments/`: Create a new appointment
+* *   `GET /api/appointments/{id}/`: Retrieve a specific appointment
+* *   `PUT /api/appointments/{id}/`: Update a specific appointment
+* *   `PATCH /api/appointments/{id}/update_status/`: Update appointment status
+* *   `DELETE /api/appointments/{id}/`: Delete a specific appointment
+
+#### Medical Records
+
+* *   `GET /api/records/`: List all medical records
+* *   `POST /api/records/`: Create a new medical record
+* *   `GET /api/records/{id}/`: Retrieve a specific medical record
+* *   `PUT /api/records/{id}/`: Update a specific medical record
+* *   `DELETE /api/records/{id}/`: Delete a specific medical record
+
+
+## Data Models
+
+### User
+
+* *   Username, password, email
+* *   First name, last name
+* *   Role (Staff/Doctor)
+
+### Patient
+
+* *   First name, last name
+* *   Date of birth
+* *   Email, phone, address
+* *   Insurance provider, insurance ID
+
+### Doctor (Linked to users - Role - Doctor)
+
+* *   First name, last name
+* *   Email, phone
+* *   Specialization, bio
+
+### Availability
+
+* *   Doctor (FK)
+* *   Day of week (MON, TUE, WED, etc.)
+* *   Start time, end time
+
+### Appointment
+
+* *   Patient (FK)
+* *   Doctor (FK)
+* *   Appointment datetime
+* *   Status (SCHEDULED, COMPLETED, CANCELLED)
+* *   Reason, notes
+
+### Medical Record
+
+* *   Patient (FK)
+* *   Doctor (FK)
+* *   Appointment (FK)
+* *   Diagnosis, symptoms, prescription, notes
+* *   Created by, updated by
+
+
+## Key Implementation Details
+
+### Appointment Validation
+
+The system validates appointments for:
+
+1. 1.  Time conflicts with existing appointments
+1. 2.  Doctor availability on the selected day and time
+1. 3.  Prevention of scheduling in the past
+
+### Timezone Handling
+
+All appointments are stored in UTC but displayed in the user's local timezone to prevent scheduling confusion.
+
+### Authentication & Authorization
+
+JWT tokens expire after 1 hour, with refresh tokens valid for 24 hours. Different user roles have different permissions in the system.
+
+## Development Notes
+
+### Adding New Features
+
+1. 1.  Create models in the appropriate app
+1. 2.  Create serializers for the models
+1. 3.  Create viewsets or API views
+1. 4.  Add URLs to the app's urls.py
+1. 5.  Update the main urls.py if needed
+
+### Testing the API
+
+Use the Swagger UI to test API endpoints during development. For automated testing, use Django's test framework:
+
+bash
+
+```bash
+python manage.py test
+```
+
+### Common Issues
+
+* *   **401 Unauthorized**: Check that you're including the JWT token in the Authorization header with the format: `Bearer YOUR_TOKEN`
+* *   **400 Bad Request**: Check your request payload against the API documentation
+* *   **JWT Token Expiration**: JWT tokens expire after 1 hour; use the refresh token to get a new access token
+
+
+
+### Notification System
+
+* *   Real-time notifications for appointments and status changes
+* *   Email notifications with 
+* *   SMS integration for urgent communications
+* *   In-app notification center with read/unread status
+
+## Design Decisions
+
+### Backend Architecture (Django)
+
+1. 1.  **Model Organization**:* *   Organized models into logical apps (patients, doctors, appointments, records) for better code organization and separation of concerns
+1.     * *   Used Django's built-in user model with role-based authentication to distinguish between staff and doctors
+1. 2.  **API Design**:* *   Used Django REST Framework for creating RESTful APIs with proper validation and serialization
+1.     * *   Implemented specialized endpoints (like available\_slots) to handle complex business logic
+1. 3.  **Time Zone Handling**:* *   Implemented proper timezone handling to ensure appointment times are correctly interpreted regardless of user location
+1.     * *   Store times in UTC in the database but display them in the user's local timezone
+1. 4.  **Validation Logic**:* *   Added comprehensive validation in the appointment serializer to:* *   Prevent scheduling in the past
+1.     *     * *   Verify doctor availability for the selected day and time
+1.     *     * *   Check for appointment conflicts
+1.     *     * *   Provide clear error messages
+
+
+### Frontend Architecture (React)
+
+1. 1.  **Component Structure**:* *   Organized components by feature (appointments, doctors, patients, records)
+1.     * *   Created reusable form components to handle CRUD operations consistently
+1. 2.  **Authentication**:* *   Implemented JWT token-based authentication with refresh tokens
+1.     * *   Created a centralized authentication context for managing user state
+1. 3.  **Route Protection**:* *   Used role-based route protection to restrict access based on user role
+1.     * *   Different navigation options for staff vs doctors
+
+1. 4.  **Date and Time Handling**:* *   Ensured consistent date/time format between frontend and backend
+1.     * *   Implemented proper timezone handling to avoid confusion

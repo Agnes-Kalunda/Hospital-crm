@@ -23,7 +23,6 @@ const DoctorAvailability = () => {
     { id: 'SUN', name: 'Sunday' },
   ];
   
-  
   const generateTimeSlots = () => {
     const slots = [];
     for (let hour = 8; hour < 18; hour++) {
@@ -40,7 +39,6 @@ const DoctorAvailability = () => {
     const fetchDoctorData = async () => {
       setLoading(true);
       try {
-        
         const res = await axios.get('/api/doctors/');
         
         const doctorRecord = res.data.find(d => 
@@ -65,17 +63,34 @@ const DoctorAvailability = () => {
     fetchDoctorData();
   }, [user]);
   
+  // Standardize time format to HH:MM (without seconds)
+  const formatTimeString = (timeStr) => {
+    if (!timeStr) return '';
+    
+    // Handle time with seconds or milliseconds (e.g., "09:00:00" or "09:00:00.000")
+    if (timeStr.includes(':')) {
+      return timeStr.split(':').slice(0, 2).join(':');
+    }
+    return timeStr;
+  };
+  
   const fetchAvailability = async (id) => {
     setLoading(true);
     try {
       const res = await axios.get(`/api/doctors/${id}/availabilities/`);
       
-      // Update availabilities state
-      setAvailabilities(res.data);
+      // Format times consistently before updating state
+      const formattedAvailabilities = res.data.map(avail => ({
+        ...avail,
+        start_time: formatTimeString(avail.start_time),
+        end_time: formatTimeString(avail.end_time)
+      }));
       
+      // Update availabilities state
+      setAvailabilities(formattedAvailabilities);
       
       if (selectedDay) {
-        const updatedAvailability = res.data.find(a => a.day_of_week === selectedDay.id);
+        const updatedAvailability = formattedAvailabilities.find(a => a.day_of_week === selectedDay.id);
         if (updatedAvailability) {
           setStartTime(updatedAvailability.start_time);
           setEndTime(updatedAvailability.end_time);
@@ -94,25 +109,11 @@ const DoctorAvailability = () => {
     
     setSelectedDay(day);
     
-    
     const existingAvailability = getAvailabilityForDay(day.id);
     if (existingAvailability) {
-      
-      let start = existingAvailability.start_time;
-      let end = existingAvailability.end_time;
-      
-      // Ensure they're in HH:MM format
-      if (start.includes('.')) {
-        start = start.split('.')[0]; 
-      }
-      if (end.includes('.')) {
-        end = end.split('.')[0]; 
-      }
-      
-      setStartTime(start);
-      setEndTime(end);
+      setStartTime(existingAvailability.start_time);
+      setEndTime(existingAvailability.end_time);
     } else {
-    
       setStartTime('09:00');
       setEndTime('17:00');
     }
@@ -122,59 +123,53 @@ const DoctorAvailability = () => {
     return availabilities.find(a => a.day_of_week === dayId);
   };
   
-
-const saveAvailability = async (start, end) => {
-  if (!selectedDay || !doctorId) {
-    toast.error('Please select a day first');
-    return;
-  }
-  
-  if (start >= end) {
-    toast.error('End time must be after start time');
-    return;
-  }
-  
-  setSaving(true);
-  try {
-    const availability = getAvailabilityForDay(selectedDay.id);
-    
-    if (availability) {
-    
-      console.log(`Removing existing availability with ID ${availability.id}`);
-      await axios.delete(`/api/doctors/${doctorId}/remove_availability/?availability_id=${availability.id}`);
-      
-      
-      console.log(`Creating new availability for ${selectedDay.id}`);
-      await axios.post(`/api/doctors/${doctorId}/add_availability/`, {
-        day_of_week: selectedDay.id,
-        start_time: start,
-        end_time: end
-      });
-      
-      toast.success(`Updated availability for ${selectedDay.name}`);
-    } else {
-  
-      await axios.post(`/api/doctors/${doctorId}/add_availability/`, {
-        day_of_week: selectedDay.id,
-        start_time: start,
-        end_time: end
-      });
-      toast.success(`Added availability for ${selectedDay.name}`);
+  const saveAvailability = async (start, end) => {
+    if (!selectedDay || !doctorId) {
+      toast.error('Please select a day first');
+      return;
     }
     
-
-    setStartTime(start);
-    setEndTime(end);
+    if (start >= end) {
+      toast.error('End time must be after start time');
+      return;
+    }
     
-    
-    await fetchAvailability(doctorId);
-  } catch (err) {
-    console.error('Error saving availability:', err);
-    toast.error(`Failed to save availability: ${err.response?.data?.detail || err.message}`);
-  } finally {
-    setSaving(false);
-  }
-};
+    setSaving(true);
+    try {
+      const availability = getAvailabilityForDay(selectedDay.id);
+      
+      if (availability) {
+        console.log(`Removing existing availability with ID ${availability.id}`);
+        await axios.delete(`/api/doctors/${doctorId}/remove_availability/?availability_id=${availability.id}`);
+        
+        console.log(`Creating new availability for ${selectedDay.id}`);
+        await axios.post(`/api/doctors/${doctorId}/add_availability/`, {
+          day_of_week: selectedDay.id,
+          start_time: start,
+          end_time: end
+        });
+        
+        toast.success(`Updated availability for ${selectedDay.name}`);
+      } else {
+        await axios.post(`/api/doctors/${doctorId}/add_availability/`, {
+          day_of_week: selectedDay.id,
+          start_time: start,
+          end_time: end
+        });
+        toast.success(`Added availability for ${selectedDay.name}`);
+      }
+      
+      setStartTime(start);
+      setEndTime(end);
+      
+      await fetchAvailability(doctorId);
+    } catch (err) {
+      console.error('Error saving availability:', err);
+      toast.error(`Failed to save availability: ${err.response?.data?.detail || err.message}`);
+    } finally {
+      setSaving(false);
+    }
+  };
   
   const handleRemoveAvailability = async () => {
     if (!selectedDay || !doctorId) return;
@@ -189,7 +184,6 @@ const saveAvailability = async (start, end) => {
     try {
       await axios.delete(`/api/doctors/${doctorId}/remove_availability/?availability_id=${availability.id}`);
       toast.success(`Removed availability for ${selectedDay.name}`);
-      
       
       fetchAvailability(doctorId);
       setSelectedDay(null);
@@ -333,7 +327,6 @@ const saveAvailability = async (start, end) => {
                         const newStartTime = e.target.value;
                         setStartTime(newStartTime);
                         
-                        
                         if (newStartTime >= endTime) {
                           const startTimeIndex = timeSlots.indexOf(newStartTime);
                           if (startTimeIndex < timeSlots.length - 1) {
@@ -356,7 +349,6 @@ const saveAvailability = async (start, end) => {
                       onChange={(e) => {
                         const newEndTime = e.target.value;
                         setEndTime(newEndTime);
-                        
                         
                         if (startTime >= newEndTime) {
                           const endTimeIndex = timeSlots.indexOf(newEndTime);
@@ -381,7 +373,6 @@ const saveAvailability = async (start, end) => {
                 </button>
               </div>
               
-              
               <div>
                 <h4 className="text-sm font-medium text-gray-700 mb-2">Time Slots</h4>
                 <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 gap-2 border rounded-md p-4 bg-white">
@@ -404,7 +395,6 @@ const saveAvailability = async (start, end) => {
                 </div>
               </div>
               
-        
               {getAvailabilityForDay(selectedDay.id) && (
                 <button
                   onClick={handleRemoveAvailability}
@@ -460,34 +450,34 @@ const saveAvailability = async (start, end) => {
                           {availability.end_time}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                            <button
-                              onClick={() => handleDaySelect(day)}
-                              className="text-indigo-600 hover:text-indigo-900"
-                            >
+                          <button
+                            onClick={() => handleDaySelect(day)}
+                            className="text-indigo-600 hover:text-indigo-900"
+                          >
                             Edit
                           </button>
                           <span className="mx-2 text-gray-300">|</span>
-                           <button
-                        onClick={() => {
-                          setSaving(true);
-                          axios.delete(`/api/doctors/${doctorId}/remove_availability/?availability_id=${availability.id}`)
-                            .then(() => {
-                              toast.success(`Removed availability for ${day ? day.name : availability.day_of_week}`);
-                              fetchAvailability(doctorId);
-                            })
-                            .catch(err => {
-                              console.error('Error removing availability:', err);
-                              toast.error(`Failed to remove availability: ${err.response?.data?.detail || err.message}`);
-                            })
-                            .finally(() => {
-                              setSaving(false);
-                            });
-                        }}
-                        className="text-red-600 hover:text-red-900"
-                        disabled={saving}
-                      >
-                        Delete
-                      </button>
+                          <button
+                            onClick={() => {
+                              setSaving(true);
+                              axios.delete(`/api/doctors/${doctorId}/remove_availability/?availability_id=${availability.id}`)
+                                .then(() => {
+                                  toast.success(`Removed availability for ${day ? day.name : availability.day_of_week}`);
+                                  fetchAvailability(doctorId);
+                                })
+                                .catch(err => {
+                                  console.error('Error removing availability:', err);
+                                  toast.error(`Failed to remove availability: ${err.response?.data?.detail || err.message}`);
+                                })
+                                .finally(() => {
+                                  setSaving(false);
+                                });
+                            }}
+                            className="text-red-600 hover:text-red-900"
+                            disabled={saving}
+                          >
+                            Delete
+                          </button>
                         </td>
                       </tr>
                     );
