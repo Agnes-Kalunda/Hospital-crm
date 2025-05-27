@@ -6,7 +6,7 @@ This is a simple web application designed to manage doctor appointments, patient
 
 * *   **Backend**: Django 3.2 with Django REST Framework
 * *   **Authentication**: JWT (JSON Web Tokens) via SimpleJWT
-* *   **Database**: SQLite (development) / PostgreSQL (production)
+* *   **Database**: postgres
 * *   **API Documentation**: Swagger/OpenAPI via drf-yasg
 * *   **Frontend**: React (with tailwind CSS)
 
@@ -34,7 +34,7 @@ This is a simple web application designed to manage doctor appointments, patient
 bash
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/Agnes-Kalunda/Hospital-crm.git
 cd hospital
 ```
 
