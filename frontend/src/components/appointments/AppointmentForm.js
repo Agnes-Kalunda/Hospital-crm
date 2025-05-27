@@ -529,7 +529,7 @@ const AppointmentForm = () => {
                   </select>
                 </div>
               </div>
-              
+{/*               
               <div className="sm:col-span-6">
                 <label htmlFor="reason" className="block text-sm font-medium text-gray-700">
                   Reason for Appointment
@@ -544,11 +544,11 @@ const AppointmentForm = () => {
                     onChange={handleChange}
                   />
                 </div>
-              </div>
+              </div> */}
               
               <div className="sm:col-span-6">
                 <label htmlFor="notes" className="block text-sm font-medium text-gray-700">
-                  Additional Notes
+                  Notes
                 </label>
                 <div className="mt-1">
                   <textarea

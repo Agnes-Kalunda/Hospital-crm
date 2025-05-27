@@ -35,7 +35,7 @@ const Sidebar = () => {
             Patients
           </Link>
         </li>
-        {userRole !== 'DOCTOR' && (
+        {/* {userRole !== 'DOCTOR' && (
         <li>
           <Link
             to="/doctors"
@@ -61,7 +61,7 @@ const Sidebar = () => {
             Appointments
           </Link>
         </li>
-        )}
+        )} */}
         <li>
           <Link
             to="/records"
