@@ -66,9 +66,21 @@ const DoctorAvailability = () => {
   }, [user]);
   
   const fetchAvailability = async (id) => {
+    setLoading(true);
     try {
       const res = await axios.get(`/api/doctors/${id}/availabilities/`);
+      
+      // Update availabilities state
       setAvailabilities(res.data);
+      
+      
+      if (selectedDay) {
+        const updatedAvailability = res.data.find(a => a.day_of_week === selectedDay.id);
+        if (updatedAvailability) {
+          setStartTime(updatedAvailability.start_time);
+          setEndTime(updatedAvailability.end_time);
+        }
+      }
     } catch (err) {
       console.error('Error fetching availabilities:', err);
       toast.error('Failed to load availability data');
@@ -78,13 +90,27 @@ const DoctorAvailability = () => {
   };
   
   const handleDaySelect = (day) => {
+    if (!day) return;
+    
     setSelectedDay(day);
     
     
     const existingAvailability = getAvailabilityForDay(day.id);
     if (existingAvailability) {
-      setStartTime(existingAvailability.start_time);
-      setEndTime(existingAvailability.end_time);
+      
+      let start = existingAvailability.start_time;
+      let end = existingAvailability.end_time;
+      
+      // Ensure they're in HH:MM format
+      if (start.includes('.')) {
+        start = start.split('.')[0]; 
+      }
+      if (end.includes('.')) {
+        end = end.split('.')[0]; 
+      }
+      
+      setStartTime(start);
+      setEndTime(end);
     } else {
     
       setStartTime('09:00');
@@ -96,49 +122,59 @@ const DoctorAvailability = () => {
     return availabilities.find(a => a.day_of_week === dayId);
   };
   
-  const saveAvailability = async (start, end) => {
-    if (!selectedDay || !doctorId) {
-      toast.error('Please select a day first');
-      return;
+
+const saveAvailability = async (start, end) => {
+  if (!selectedDay || !doctorId) {
+    toast.error('Please select a day first');
+    return;
+  }
+  
+  if (start >= end) {
+    toast.error('End time must be after start time');
+    return;
+  }
+  
+  setSaving(true);
+  try {
+    const availability = getAvailabilityForDay(selectedDay.id);
+    
+    if (availability) {
+    
+      console.log(`Removing existing availability with ID ${availability.id}`);
+      await axios.delete(`/api/doctors/${doctorId}/remove_availability/?availability_id=${availability.id}`);
+      
+      
+      console.log(`Creating new availability for ${selectedDay.id}`);
+      await axios.post(`/api/doctors/${doctorId}/add_availability/`, {
+        day_of_week: selectedDay.id,
+        start_time: start,
+        end_time: end
+      });
+      
+      toast.success(`Updated availability for ${selectedDay.name}`);
+    } else {
+  
+      await axios.post(`/api/doctors/${doctorId}/add_availability/`, {
+        day_of_week: selectedDay.id,
+        start_time: start,
+        end_time: end
+      });
+      toast.success(`Added availability for ${selectedDay.name}`);
     }
     
+
+    setStartTime(start);
+    setEndTime(end);
     
-    if (start >= end) {
-      toast.error('End time must be after start time');
-      return;
-    }
     
-    setSaving(true);
-    try {
-      const availability = getAvailabilityForDay(selectedDay.id);
-      
-      if (availability) {
-      
-        await axios.put(`/api/doctors/${doctorId}/availabilities/${availability.id}/`, {
-          day_of_week: selectedDay.id,
-          start_time: start,
-          end_time: end
-        });
-        toast.success(`Updated availability for ${selectedDay.name}`);
-      } else {
-    
-        await axios.post(`/api/doctors/${doctorId}/add_availability/`, {
-          day_of_week: selectedDay.id,
-          start_time: start,
-          end_time: end
-        });
-        toast.success(`Added availability for ${selectedDay.name}`);
-      }
-      
-      
-      fetchAvailability(doctorId);
-    } catch (err) {
-      console.error('Error saving availability:', err);
-      toast.error(`Failed to save availability: ${err.response?.data?.detail || err.message}`);
-    } finally {
-      setSaving(false);
-    }
-  };
+    await fetchAvailability(doctorId);
+  } catch (err) {
+    console.error('Error saving availability:', err);
+    toast.error(`Failed to save availability: ${err.response?.data?.detail || err.message}`);
+  } finally {
+    setSaving(false);
+  }
+};
   
   const handleRemoveAvailability = async () => {
     if (!selectedDay || !doctorId) return;
@@ -317,7 +353,18 @@ const DoctorAvailability = () => {
                       id="end_time"
                       className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                       value={endTime}
-                      onChange={(e) => setEndTime(e.target.value)}
+                      onChange={(e) => {
+                        const newEndTime = e.target.value;
+                        setEndTime(newEndTime);
+                        
+                        
+                        if (startTime >= newEndTime) {
+                          const endTimeIndex = timeSlots.indexOf(newEndTime);
+                          if (endTimeIndex > 0) {
+                            setStartTime(timeSlots[endTimeIndex - 1]);
+                          }
+                        }
+                      }}
                     >
                       {timeSlots.map(time => (
                         <option key={`end-${time}`} value={time}>{time}</option>
@@ -412,7 +459,7 @@ const DoctorAvailability = () => {
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                           {availability.end_time}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                           <button
                             onClick={() => handleDaySelect(day)}
                             className="text-indigo-600 hover:text-indigo-900"
