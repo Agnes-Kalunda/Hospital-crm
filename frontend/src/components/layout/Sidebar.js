@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { AuthContext } from '../../context/AuthContext';
 
 const Sidebar = () => {
   const location = useLocation();
-  
+  const { userRole } = useContext(AuthContext);
+
   const isActive = (path) => {
     return location.pathname.startsWith(path) ? 'active' : '';
   };
@@ -33,6 +35,7 @@ const Sidebar = () => {
             Patients
           </Link>
         </li>
+        {userRole !== 'DOCTOR' && (
         <li>
           <Link
             to="/doctors"
@@ -44,6 +47,9 @@ const Sidebar = () => {
             Doctors
           </Link>
         </li>
+        )}
+
+        {userRole !== 'DOCTOR' && (
         <li>
           <Link
             to="/appointments"
@@ -55,6 +61,7 @@ const Sidebar = () => {
             Appointments
           </Link>
         </li>
+        )}
         <li>
           <Link
             to="/records"
