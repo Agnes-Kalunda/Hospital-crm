@@ -460,12 +460,34 @@ const saveAvailability = async (start, end) => {
                           {availability.end_time}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                          <button
-                            onClick={() => handleDaySelect(day)}
-                            className="text-indigo-600 hover:text-indigo-900"
-                          >
+                            <button
+                              onClick={() => handleDaySelect(day)}
+                              className="text-indigo-600 hover:text-indigo-900"
+                            >
                             Edit
                           </button>
+                          <span className="mx-2 text-gray-300">|</span>
+                           <button
+                        onClick={() => {
+                          setSaving(true);
+                          axios.delete(`/api/doctors/${doctorId}/remove_availability/?availability_id=${availability.id}`)
+                            .then(() => {
+                              toast.success(`Removed availability for ${day ? day.name : availability.day_of_week}`);
+                              fetchAvailability(doctorId);
+                            })
+                            .catch(err => {
+                              console.error('Error removing availability:', err);
+                              toast.error(`Failed to remove availability: ${err.response?.data?.detail || err.message}`);
+                            })
+                            .finally(() => {
+                              setSaving(false);
+                            });
+                        }}
+                        className="text-red-600 hover:text-red-900"
+                        disabled={saving}
+                      >
+                        Delete
+                      </button>
                         </td>
                       </tr>
                     );
