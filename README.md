@@ -269,13 +269,8 @@ JWT tokens expire after 1 hour, with refresh tokens valid for 24 hours. Differen
 
 ### Testing the API
 
-Use the Swagger UI to test API endpoints during development. For automated testing, use Django's test framework:
+Use the Swagger UI to test API endpoints during development. 
 
-bash
-
-```bash
-python manage.py test
-```
 
 ### Common Issues
 
@@ -283,14 +278,20 @@ python manage.py test
 *  **400 Bad Request**: Check your request payload against the API documentation
 *    **JWT Token Expiration**: JWT tokens expire after 1 hour; use the refresh token to get a new access token
 
+## Areas of improvement with additional time
 
-
-### Notification System
+#### Notification System
 
 *    Real-time notifications for appointments and status changes
 *    Email notifications with 
 *    SMS integration for urgent communications
 *    In-app notification center with read/unread status
+
+#### Improved insurance data collection
+
+#### Improved medical data collection
+
+
 
 ## Design Decisions
 
