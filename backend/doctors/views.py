@@ -9,6 +9,10 @@ import datetime
 
 from .models import Doctor, Availability
 from .serializers import DoctorSerializer, DoctorListSerializer, AvailabilitySerializer
+from patients.models import Patient
+from patients.serializers import PatientListSerializer
+from records.models import MedicalRecord
+from records.serializers import MedicalRecordSerializer
 from appointments.models import Appointment
 
 # Create your views here.
@@ -112,3 +116,33 @@ class DoctorViewSet(viewsets.ModelViewSet):
             "day_of_week": date.strftime('%A'),
             "available_slots": formatted_slots
         })
+        
+
+
+        
+    @action(detail=False, methods=['get'])
+    def my_patients(self, request):
+        try:
+            
+            doctor = Doctor.objects.get(user=request.user)
+            
+            patient_ids = Appointment.objects.filter(doctor=doctor).values_list('patient', flat=True).distinct()
+            patients = Patient.objects.filter(id__in=patient_ids)
+            
+            serializer = PatientListSerializer(patients, many=True)
+            return Response(serializer.data)
+        except Doctor.DoesNotExist:
+            return Response({"detail": "No doctor profile linked to your account."}, status=status.HTTP_404_NOT_FOUND)
+
+    @action(detail=False, methods=['get'])
+    def my_records(self, request):
+        try:
+            doctor = Doctor.objects.get(user=request.user)
+            
+            patient_ids = Appointment.objects.filter(doctor=doctor).values_list('patient', flat=True).distinct()
+            records = MedicalRecord.objects.filter(patient__id__in=patient_ids)
+            
+            serializer = MedicalRecordSerializer(records, many=True)
+            return Response(serializer.data)
+        except Doctor.DoesNotExist:
+            return Response({"detail": "No doctor profile linked to your account."}, status=status.HTTP_404_NOT_FOUND)

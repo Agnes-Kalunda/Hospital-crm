@@ -7,7 +7,7 @@ class User(AbstractUser):
         ('DOCTOR', 'Doctor'),
     )
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='STAFF')
-    
+
     
     groups = models.ManyToManyField(
         'auth.Group',

@@ -3,10 +3,12 @@ from .models import Doctor, Availability
 
 @admin.register(Doctor)
 class DoctorAdmin(admin.ModelAdmin):
-    list_display = ['first_name', 'last_name', 'email', 'specialization', 'phone']
+    list_display = ['first_name', 'last_name', 'specialization', 'user', 'email']
+    list_filter = ['specialization']
     search_fields = ['first_name', 'last_name', 'email', 'specialization']
-    list_filter = ['specialization', 'created_at']
-    readonly_fields = ['created_at', 'updated_at']
+    
+    
+    autocomplete_fields = ['user']
 
 @admin.register(Availability)
 class AvailabilityAdmin(admin.ModelAdmin):

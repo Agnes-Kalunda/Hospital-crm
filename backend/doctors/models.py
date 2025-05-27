@@ -1,8 +1,11 @@
 from django.db import models
-
+from django.contrib.auth import get_user_model
 # Create your models here.
 
+
+User = get_user_model()
 class Doctor(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
     email = models.EmailField(unique=True)
