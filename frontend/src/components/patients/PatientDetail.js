@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect , useContext} from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Spinner from '../layout/Spinner';
 import { toast } from 'react-toastify';
+import { AuthContext } from '../../context/AuthContext';
 
 const PatientDetail = () => {
   const [patient, setPatient] = useState(null);
@@ -14,7 +15,8 @@ const PatientDetail = () => {
   
   const { id } = useParams();
   const navigate = useNavigate();
-  
+  const { userRole } = useContext(AuthContext);
+
   useEffect(() => {
     const fetchPatientData = async () => {
       try {
@@ -217,48 +219,63 @@ const PatientDetail = () => {
             <div>
               <div className="d-flex justify-content-between align-items-center mb-3">
                 <h5 className="mb-0">Medical Records</h5>
-                <Link to={`/records/add?patient=${id}`} className="btn btn-sm btn-primary">
-                  <i className="bi bi-file-earmark-plus me-1"></i> Add Record
-                </Link>
-              </div>
+                {userRole !== 'DOCTOR' && (
+                    <Link to={`/records/add?patient=${id}`} className="btn btn-sm btn-primary">
+                   Add Record
+              </Link>
+                 )}
+             </div>
               
               {records.length > 0 ? (
                 <div className="table-responsive">
                   <table className="table table-hover">
                     <thead>
                       <tr>
-                        <th>Date</th>
-                        <th>Diagnosis</th>
-                        <th>Related to Appointment</th>
+                      
+                     <th>Date</th>
+                    <th>Doctor</th>
+                     <th>Diagnosis</th>
+                      <th>Symptoms</th>
+                      <th>Prescription</th>
                         <th>Actions</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {records.map(record => (
-                        <tr key={record.id}>
-                          <td>{new Date(record.created_at).toLocaleDateString()}</td>
-                          <td>{record.diagnosis || 'N/A'}</td>
-                          <td>
-                            {record.appointment ? (
-                              <Link to={`/appointments/${record.appointment}`}>
-                                View Appointment
-                              </Link>
-                            ) : (
-                              'N/A'
-                            )}
-                          </td>
-                          <td>
-                            <Link to={`/records/${record.id}`} className="btn btn-sm btn-info me-2">
-                              <i className="bi bi-eye"></i>
-                            </Link>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
+            {records.map(record => (
+              <tr key={record.id}>
+                <td>{new Date(record.created_at).toLocaleDateString()}</td>
+                <td>
+                  {record.doctor_details ? 
+                    `Dr. ${record.doctor_details.first_name} ${record.doctor_details.last_name}` : 
+                    'N/A'}
+                </td>
+                <td>{record.diagnosis || 'N/A'}</td>
+                <td>{record.symptoms || 'N/A'}</td>
+                <td>{record.prescription || 'N/A'}</td>
+                <td>
+                  <Link to={`/records/${record.id}`} className="btn btn-sm btn-info me-2">
+                    View
+                  </Link>
+                  {userRole !== 'DOCTOR' && (
+                    <Link to={`/records/${record.id}/edit`} className="btn btn-sm btn-warning">
+                      Edit
+                    </Link>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
                   </table>
                 </div>
               ) : (
-                <p className="text-center py-3">No medical records found</p>
+          <div className="text-center py-3">
+        <p className="text-muted">No medical records found for this patient.</p>
+        {userRole !== 'DOCTOR' && (
+          <Link to={`/records/add?patient=${id}`} className="btn btn-primary">
+            Create First Medical Record
+          </Link>
+        )}
+      </div>
               )}
             </div>
           )}

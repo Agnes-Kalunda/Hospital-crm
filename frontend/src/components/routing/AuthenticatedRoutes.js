@@ -73,11 +73,13 @@ const AuthenticatedRoutes = () => {
             )}
             
             {userRole === 'DOCTOR' && (
-              <>
+                <>
                 <Route path="/my-appointments" element={<DoctorAppointments />} />
                 <Route path="/availability" element={<DoctorAvailability />} />
                 <Route path="/appointments/:id" element={<AppointmentDetail />} />
+                <Route path="/patients" element={<PatientList />} />
                 <Route path="/patients/:id" element={<PatientDetail />} />
+                <Route path="/records" element={<MedicalRecordList />} />
                 <Route path="/records/:id" element={<MedicalRecordDetail />} />
               </>
             )}

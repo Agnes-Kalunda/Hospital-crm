@@ -146,3 +146,26 @@ class DoctorViewSet(viewsets.ModelViewSet):
             return Response(serializer.data)
         except Doctor.DoesNotExist:
             return Response({"detail": "No doctor profile linked to your account."}, status=status.HTTP_404_NOT_FOUND)
+        
+        
+    @action(detail=False, methods=['get'])
+    def my_appointments(self, request):
+
+        try:
+            doctor = Doctor.objects.get(user=request.user)
+        
+        
+            appointments = Appointment.objects.filter(doctor=doctor).order_by('-appointment_datetime')
+        
+        
+            date = request.query_params.get('date', None)
+            if date:
+                appointments = appointments.filter(appointment_datetime__date=date)
+        
+    
+            from appointments.serializers import AppointmentSerializer
+            serializer = AppointmentSerializer(appointments, many=True)
+            return Response(serializer.data)
+        
+        except Doctor.DoesNotExist:
+            return Response({"detail": "No doctor profile linked to your account."}, status=status.HTTP_404_NOT_FOUND)

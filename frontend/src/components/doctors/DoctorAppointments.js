@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
+import axios from 'axios';
 
 const DoctorAppointments = () => {
   const { user } = useContext(AuthContext);
@@ -9,32 +10,9 @@ const DoctorAppointments = () => {
   const [filter, setFilter] = useState('upcoming'); 
   
   useEffect(() => {
-    
-    setLoading(false);
-    setAppointments([
-      {
-        id: 1,
-        appointment_datetime: new Date().toISOString(),
-        patient_details: { first_name: 'John', last_name: 'Doe' },
-        status: 'SCHEDULED',
-        status_display: 'Scheduled',
-        reason: 'Regular checkup'
-      },
-      {
-        id: 2,
-        appointment_datetime: new Date(Date.now() + 86400000).toISOString(), // tomorrow
-        patient_details: { first_name: 'Jane', last_name: 'Smith' },
-        status: 'SCHEDULED',
-        status_display: 'Scheduled',
-        reason: 'Follow-up'
-      }
-    ]);
-    
-    
-    /*
     const fetchAppointments = async () => {
       try {
-        const res = await axios.get(`/api/appointments/?doctor=${user.id}`);
+        const res = await axios.get(`/api/doctors/my_appointments/`);
         setAppointments(res.data);
         setLoading(false);
       } catch (err) {
@@ -44,7 +22,6 @@ const DoctorAppointments = () => {
     };
     
     fetchAppointments();
-    */
   }, []);
   
   

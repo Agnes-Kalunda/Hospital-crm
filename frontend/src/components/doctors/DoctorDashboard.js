@@ -9,36 +9,20 @@ const DoctorDashboard = () => {
   const [loading, setLoading] = useState(true);
   
   useEffect(() => {
-    
-    setLoading(false);
-    setTodayAppointments([
-      {
-        id: 1,
-        appointment_datetime: new Date().toISOString(),
-        patient_details: { first_name: 'John', last_name: 'Doe' },
-        status: 'SCHEDULED',
-        status_display: 'Scheduled',
-        reason: 'Regular checkup'
-      }
-    ]);
-    
+  const fetchTodayAppointments = async () => {
+    try {
+      const today = new Date().toISOString().split('T')[0];
+      const res = await axios.get(`/api/doctors/my_appointments/?date=${today}`);
+      setTodayAppointments(res.data);
+      setLoading(false);
+    } catch (err) {
+      console.error('Error fetching appointments:', err);
+      setLoading(false);
+    }
+  };
 
-    /*
-    const fetchTodayAppointments = async () => {
-      try {
-        const today = new Date().toISOString().split('T')[0];
-        const res = await axios.get(`/api/appointments/?date=${today}&doctor=${user.id}`);
-        setTodayAppointments(res.data);
-        setLoading(false);
-      } catch (err) {
-        console.error('Error fetching appointments:', err);
-        setLoading(false);
-      }
-    };
-    
-    fetchTodayAppointments();
-    */
-  }, []);
+  fetchTodayAppointments();
+}, []);
   
   return (
     <div>
