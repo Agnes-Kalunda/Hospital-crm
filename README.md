@@ -4,7 +4,7 @@ This is a simple web application designed to manage doctor appointments, patient
 
 ## Technologies Used
 
-* *   **Backend**: Django 3.2 with Django REST Framework
+*  **Backend**: Django 3.2 with Django REST Framework
 * *   **Authentication**: JWT (JSON Web Tokens) via SimpleJWT
 * *   **Database**: postgres
 * *   **API Documentation**: Swagger/OpenAPI via drf-yasg
@@ -29,7 +29,7 @@ This is a simple web application designed to manage doctor appointments, patient
 
 ### Backend Setup
 
-1. 1.  **Clone the repository**
+1.   **Clone the repository**
 
 bash
 
@@ -319,3 +319,135 @@ python manage.py test
 
 1. 4.  **Date and Time Handling**:* *   Ensured consistent date/time format between frontend and backend
 1.     * *   Implemented proper timezone handling to avoid confusion
+
+## Database Schema
+
+~~~+---------------------+       +---------------------+       +---------------------+
+|       User          |       |       Doctor        |       |     Availability    |
++---------------------+       +---------------------+       +---------------------+
+| id: int (PK)        |       | id: int (PK)        |       | id: int (PK)        |
+| username: varchar   |       | first_name: varchar |       | doctor_id: int (FK) |
+| password: varchar   |       | last_name: varchar  |       | day_of_week: varchar|
+| email: varchar      |       | email: varchar      |       | start_time: time    |
+| first_name: varchar |       | phone: varchar      |       | end_time: time      |
+| last_name: varchar  |       | specialization: var |       +---------------------+
+| role: varchar       |       | bio: text           |                |
++---------------------+       | created_at: datetime|                |
+                             | updated_at: datetime|                |
+                             +---------------------+                |
+                                       |                           |
+                                       |                           |
+                                       v                           |
++---------------------+       +---------------------+               |
+|      Patient        |       |    Appointment      |<--------------+
++---------------------+       +---------------------+
+| id: int (PK)        |       | id: int (PK)        |
+| first_name: varchar |------>| patient_id: int (FK)|
+| last_name: varchar  |       | doctor_id: int (FK) |<------+
+| date_of_birth: date |       | appointment_datetime|       |
+| email: varchar      |       | status: varchar     |       |
+| phone: varchar      |       | reason: text        |       |
+| address: text       |       | notes: text         |       |
+| insurance_provider  |       | created_at: datetime|       |
+| insurance_id        |       | updated_at: datetime|       |
+| created_at: datetime|       +---------------------+       |
+| updated_at: datetime|                |                    |
++---------------------+                |                    |
+        |                             |                    |
+        |                             v                    |
+        |                   +---------------------+        |
+        |                   |   Notification      |        |
+        |                   +---------------------+        |
+        +------------------>| id: int (PK)        |        |
+                            | patient_id: int (FK)|        |
+                            | appointment_id: FK  |        |
+                            | notification_type   |        |
+                            | message: text       |        |
+                            | status: varchar     |        |
+                            | created_at: datetime|        |
+                            | sent_at: datetime   |        |
+                            +---------------------+        |
+                                                           |
+                                                           |
+        +---------------------+                            |
+        |   MedicalRecord    |                             |
+        +---------------------+                             |
+        | id: int (PK)        |                             |
+        | patient_id: int (FK)|                             |
+        | appointment_id: FK  |-----------------------------+
+        | doctor_id: int (FK) |
+        | diagnosis: text     |
+        | symptoms: text      |
+        | prescription: text  |
+        | notes: text         |
+        | created_at: datetime|
+        | updated_at: datetime|
+        | created_by: int (FK)|
+        | updated_by: int (FK)|
+        +---------------------+~~~
+
+ Sequence Diagram for Appointment Booking
+
+
+
+~~~┌──────┐          ┌─────────┐          ┌───────┐          ┌───────────┐          ┌───────────────┐
+│Client│          │React App│          │Django │          │Doctor API │          │Appointment API│
+└──┬───┘          └────┬────┘          │Backend│          └─────┬─────┘          └───────┬───────┘
+   │                   │               └───┬───┘                │                        │
+   │ 1. Login          │                   │                    │                        │
+   │ ─────────────────>│                   │                    │                        │
+   │                   │ 2. Authentication │                    │                        │
+   │                   │ ────────────────>│                    │                        │
+   │                   │ 3. JWT Token     │                    │                        │
+   │                   │ <────────────────│                    │                        │
+   │ 4. Token          │                   │                    │                        │
+   │ <─────────────────│                   │                    │                        │
+   │                   │                   │                    │                        │
+   │ 5. Select Doctor  │                   │                    │                        │
+   │ ─────────────────>│                   │                    │                        │
+   │                   │ 6. Get Doctors    │                    │                        │
+   │                   │ ─────────────────────────────────────>│                        │
+   │                   │ 7. Doctor List    │                    │                        │
+   │                   │ <─────────────────────────────────────│                        │
+   │ 8. Doctor List    │                   │                    │                        │
+   │ <─────────────────│                   │                    │                        │
+   │                   │                   │                    │                        │
+   │ 9. Select Date    │                   │                    │                        │
+   │ ─────────────────>│                   │                    │                        │
+   │                   │ 10. Get Available │                    │                        │
+   │                   │ Slots             │                    │                        │
+   │                   │ ─────────────────────────────────────>│                        │
+   │                   │ 11. Available Slots                    │                        │
+   │                   │ <─────────────────────────────────────│                        │
+   │ 12. Available     │                   │                    │                        │
+   │ Time Slots        │                   │                    │                        │
+   │ <─────────────────│                   │                    │                        │
+   │                   │                   │                    │                        │
+   │ 13. Select Time   │                   │                    │                        │
+   │ & Submit Form     │                   │                    │                        │
+   │ ─────────────────>│                   │                    │                        │
+   │                   │ 14. Create        │                    │                        │
+   │                   │ Appointment       │                    │                        │
+   │                   │ ───────────────────────────────────────────────────────────────>
+   │                   │                   │                    │                        │
+   │                   │                   │                    │                        │
+   │                   │                   │     15. Validate Appointment                │
+   │                   │                   │     (Check doctor availability              │
+   │                   │                   │      and time conflicts)                    │
+   │                   │                   │     <────────────────────────────────────────
+   │                   │                   │                    │                        │
+   │                   │                   │     16. Create Appointment                  │
+   │                   │                   │                                              │
+   │                   │                   │     ───────────────────────────────────────>
+   │                   │                   │                    │                        │
+   │                   │ 17. Appointment   │                    │                        │
+   │                   │ Created           │                    │                        │
+   │                   │ <───────────────────────────────────────────────────────────────
+   │ 18. Success       │                   │                    │                        │
+   │ Confirmation      │                   │                    │                        │
+   │ <─────────────────│                   │                    │                        │
+   │                   │                   │                    │                        │
+┌──┴───┐          ┌────┴────┐          ┌───┴───┐          ┌─────┴─────┐          ┌───────┴───────┐
+│Client│          │React App│          │Django │          │Doctor API │          │Appointment API│
+└──────┘          └─────────┘          │Backend│          └───────────┘          └───────────────┘
+                                       └───────┘~~~
