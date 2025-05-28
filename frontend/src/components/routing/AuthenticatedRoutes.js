@@ -58,7 +58,7 @@ const AuthenticatedRoutes = () => {
                 <Route path="/doctors" element={<DoctorList />} />
               
                 
-                <Route path="/appointments" element={<AppointmentList />} />
+
                 <Route path="/appointments/add" element={<AppointmentForm />} />
 
                 <Route path="/appointments/:id/edit" element={<AppointmentForm />} />
