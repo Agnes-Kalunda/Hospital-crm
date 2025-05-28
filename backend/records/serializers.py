@@ -10,3 +10,21 @@ class MedicalRecordSerializer(serializers.ModelSerializer):
     class Meta:
         model = MedicalRecord
         fields = '__all__'
+        
+        
+        
+    def validate(self, data):
+        """
+        Custom validation for medical records.
+        """
+
+        if not data.get('symptoms') and not data.get('diagnosis'):
+            raise serializers.ValidationError("Either symptoms or diagnosis must be provided")
+        
+        
+        appointment = data.get('appointment')
+        patient = data.get('patient')
+        if appointment and patient and appointment.patient.id != patient.id:
+            raise serializers.ValidationError("The appointment must belong to the selected patient")
+        
+        return data

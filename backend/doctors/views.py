@@ -175,3 +175,4 @@ class DoctorViewSet(viewsets.ModelViewSet):
        
        except Doctor.DoesNotExist:
            return Response({"detail": "No doctor profile linked to your account."}, status=status.HTTP_404_NOT_FOUND)
+       

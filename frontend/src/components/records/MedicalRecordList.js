@@ -112,9 +112,7 @@ const MedicalRecordList = () => {
                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                    Patient
                  </th>
-                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                   Doctor
-                 </th>
+               
                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                    Diagnosis
                  </th>
@@ -136,13 +134,7 @@ const MedicalRecordList = () => {
                          'N/A'}
                      </div>
                    </td>
-                   <td className="px-6 py-4 whitespace-nowrap">
-                     <div className="text-sm text-gray-900">
-                       {record.doctor_details ? 
-                         `Dr. ${record.doctor_details.first_name} ${record.doctor_details.last_name}` : 
-                         'N/A'}
-                     </div>
-                   </td>
+                   
                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                      {record.diagnosis || 'No diagnosis recorded'}
                    </td>

@@ -4,7 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.decorators import action
 from rest_framework.response import Response
-
+from .models import Doctor
 from .models import MedicalRecord
 from .serializers import MedicalRecordSerializer
 
@@ -25,3 +25,26 @@ class MedicalRecordViewSet(viewsets.ModelViewSet):
         records = MedicalRecord.objects.filter(patient_id=patient_id)
         serializer = self.get_serializer(records, many=True)
         return Response(serializer.data)
+        
+    
+    def perform_create(self, serializer):
+        serializer.save(created_by=self.request.user, updated_by=self.request.user)
+        
+    def perform_update(self, serializer):
+        serializer.save(updated_by=self.request.user)
+        
+        
+        
+    def perform_create(self, serializer):
+        try:
+            doctor = Doctor.objects.get(user=self.request.user.id)
+            serializer.save(
+                doctor=doctor,
+                created_by=self.request.user, 
+                updated_by=self.request.user
+            )
+        except Doctor.DoesNotExist:
+            serializer.save(
+                created_by=self.request.user, 
+                updated_by=self.request.user
+            )

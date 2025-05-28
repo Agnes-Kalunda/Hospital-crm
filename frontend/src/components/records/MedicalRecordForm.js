@@ -232,6 +232,33 @@ const MedicalRecordForm = () => {
              </div>
 
              <div className="sm:col-span-6">
+  <label htmlFor="doctor" className="block text-sm font-medium text-gray-700">
+    Doctor *
+  </label>
+  <div className="mt-1">
+    <select
+      id="doctor"
+      name="doctor"
+      value={formData.doctor}
+      onChange={handleChange}
+      className={`block w-full rounded-md border ${
+        formErrors.doctor ? 'border-red-300' : 'border-gray-300'
+      } shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm`}
+    >
+      <option value="">Select Doctor</option>
+      {doctors.map(doctor => (
+        <option key={doctor.id} value={doctor.id}>
+          Dr. {doctor.first_name} {doctor.last_name}
+        </option>
+      ))}
+    </select>
+    {formErrors.doctor && (
+      <p className="mt-2 text-sm text-red-600">{formErrors.doctor}</p>
+    )}
+  </div>
+</div>
+
+             <div className="sm:col-span-6">
                <label htmlFor="appointment" className="block text-sm font-medium text-gray-700">
                  Related Appointment
                </label>
