@@ -4,7 +4,7 @@ import { AuthContext } from '../../context/AuthContext';
 import Sidebar from '../layout/Sidebar';
 import Spinner from '../layout/Spinner';
 
-import Dashboard from '../Dashboard';
+
 import StaffDashboard from '../staff/StaffDashboard';
 import DoctorDashboard from '../doctors/DoctorDashboard';
 
@@ -13,18 +13,17 @@ import PatientDetail from '../patients/PatientDetail';
 import PatientForm from '../patients/PatientForm';
 
 import DoctorList from '../doctors/DoctorList';
-import DoctorDetail from '../doctors/DoctorDetail';
-import DoctorForm from '../doctors/DoctorForm';
+
+
 import DoctorAvailability from '../doctors/DoctorAvailability';
 
 import AppointmentList from '../appointments/AppointmentList';
-import AppointmentDetail from '../appointments/AppointmentDetail';
+
 import AppointmentForm from '../appointments/AppointmentForm';
 import DoctorAppointments from '../doctors/DoctorAppointments';
 
 import MedicalRecordList from '../records/MedicalRecordList';
-import MedicalRecordDetail from '../records/MedicalRecordDetail';
-import MedicalRecordForm from '../records/MedicalRecordForm';
+
 
 const AuthenticatedRoutes = () => {
   const { token, loading, userRole } = useContext(AuthContext);
@@ -57,18 +56,15 @@ const AuthenticatedRoutes = () => {
                 <Route path="/patients/:id/edit" element={<PatientForm />} />
                 
                 <Route path="/doctors" element={<DoctorList />} />
-                <Route path="/doctors/add" element={<DoctorForm />} />
-                <Route path="/doctors/:id" element={<DoctorDetail />} />
-                <Route path="/doctors/:id/edit" element={<DoctorForm />} />
+              
                 
                 <Route path="/appointments" element={<AppointmentList />} />
                 <Route path="/appointments/add" element={<AppointmentForm />} />
-                <Route path="/appointments/:id" element={<AppointmentDetail />} />
+
                 <Route path="/appointments/:id/edit" element={<AppointmentForm />} />
                 
                 <Route path="/records" element={<MedicalRecordList />} />
-                <Route path="/records/add" element={<MedicalRecordForm />} />
-                <Route path="/records/:id" element={<MedicalRecordDetail />} />
+              
               </>
             )}
             
@@ -76,11 +72,11 @@ const AuthenticatedRoutes = () => {
                 <>
                 <Route path="/my-appointments" element={<DoctorAppointments />} />
                 <Route path="/availability" element={<DoctorAvailability />} />
-                <Route path="/appointments/:id" element={<AppointmentDetail />} />
+               
                 <Route path="/patients" element={<PatientList />} />
                 <Route path="/patients/:id" element={<PatientDetail />} />
                 <Route path="/records" element={<MedicalRecordList />} />
-                <Route path="/records/:id" element={<MedicalRecordDetail />} />
+               
               </>
             )}
             

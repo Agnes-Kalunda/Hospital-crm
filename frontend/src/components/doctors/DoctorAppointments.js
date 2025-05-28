@@ -139,9 +139,7 @@ const DoctorAppointments = () => {
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                          <Link to={`/appointments/${appointment.id}`} className="text-indigo-600 hover:text-indigo-900 mr-4">
-                            View
-                          </Link>
+                          
                           {appointment.status === 'SCHEDULED' && (
                             <button className="text-green-600 hover:text-green-900">
                               Complete

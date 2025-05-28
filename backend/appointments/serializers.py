@@ -10,10 +10,14 @@ class AppointmentSerializer(serializers.ModelSerializer):
     doctor_details = DoctorListSerializer(source='doctor', read_only=True)
     status_display = serializers.CharField(source='get_status_display', read_only=True)
     is_upcoming = serializers.BooleanField(read_only=True)
-    
+    appointment_date = serializers.SerializerMethodField()
+     
     class Meta:
         model = Appointment
         fields = '__all__'
+        
+    def get_appointment_date(self, obj):
+        return obj.appointment_datetime.date()
         
     def validate(self, data):
         doctor = data.get('doctor')

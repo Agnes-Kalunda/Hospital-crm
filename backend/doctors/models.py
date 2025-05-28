@@ -1,9 +1,8 @@
 from django.db import models
 from django.contrib.auth import get_user_model
-# Create your models here.
-
 
 User = get_user_model()
+
 class Doctor(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
     first_name = models.CharField(max_length=100)
@@ -34,12 +33,15 @@ class Availability(models.Model):
     
     doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE, related_name='availabilities')
     day_of_week = models.CharField(max_length=3, choices=DAYS_OF_WEEK)
+    specific_date = models.DateField(null=True, blank=True)
     start_time = models.TimeField()
     end_time = models.TimeField()
 
     class Meta:
-        unique_together = ['doctor', 'day_of_week']
+        unique_together = [['doctor', 'day_of_week', 'specific_date']]
         verbose_name_plural = 'Availabilities'
         
     def __str__(self):
+        if self.specific_date:
+            return f"{self.doctor} - {self.specific_date.strftime('%Y-%m-%d')} ({self.start_time} - {self.end_time})"
         return f"{self.doctor} - {self.get_day_of_week_display()} ({self.start_time} - {self.end_time})"

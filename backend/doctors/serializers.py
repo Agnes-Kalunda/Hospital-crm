@@ -6,7 +6,7 @@ class AvailabilitySerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Availability
-        fields = ['id', 'day_of_week', 'day_of_week_display', 'start_time', 'end_time']
+        fields = ['id', 'day_of_week', 'day_of_week_display', 'specific_date', 'start_time', 'end_time']
         
     def validate(self, data):
         """
