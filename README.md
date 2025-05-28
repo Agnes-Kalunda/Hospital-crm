@@ -269,9 +269,11 @@ JWT tokens expire after 1 hour, with refresh tokens valid for 24 hours. Differen
 
 ### Testing the API
 
-Use the Swagger UI to test API endpoints during development. 
+To manually test the API endpoints, while inside the ```backend``` folder , run the command below;
 
+```python manage.py test records```
 
+The test file is located inside the records app.
 ### Common Issues
 
 *   **401 Unauthorized**: Check that you're including the JWT token in the Authorization header with the format: `Bearer YOUR_TOKEN`
