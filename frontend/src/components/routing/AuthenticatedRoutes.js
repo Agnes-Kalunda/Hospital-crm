@@ -14,7 +14,7 @@ import PatientForm from '../patients/PatientForm';
 
 import DoctorList from '../doctors/DoctorList';
 
-
+import MedicalRecordForm from '../records/MedicalRecordForm';
 import DoctorAvailability from '../doctors/DoctorAvailability';
 
 import AppointmentList from '../appointments/AppointmentList';
@@ -76,7 +76,8 @@ const AuthenticatedRoutes = () => {
                 <Route path="/patients" element={<PatientList />} />
                 <Route path="/patients/:id" element={<PatientDetail />} />
                 <Route path="/records" element={<MedicalRecordList />} />
-               
+                <Route path="/records/add" element={<MedicalRecordForm />} />
+               <Route path="/records/:id/edit" element={<MedicalRecordForm />} />
               </>
             )}
             

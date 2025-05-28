@@ -183,13 +183,11 @@ const PatientDetail = () => {
           {activeTab === 'records' && (
             <div>
               <div className="d-flex justify-content-between align-items-center mb-3">
-                <h5 className="mb-0">Medical Records</h5>
-                {userRole !== 'DOCTOR' && (
-                    <Link to={`/records/add?patient=${id}`} className="btn btn-sm btn-primary">
-                   Add Record
-              </Link>
-                 )}
-             </div>
+    <h5 className="mb-0">Medical Records</h5>
+    <Link to={`/records/add?patient=${id}`} className="btn btn-sm btn-primary">
+      Add Record
+    </Link>
+  </div>
               
               {records.length > 0 ? (
                 <div className="table-responsive">
@@ -221,11 +219,11 @@ const PatientDetail = () => {
                   <Link to={`/records/${record.id}`} className="btn btn-sm btn-info me-2">
                     View
                   </Link>
-                  {userRole !== 'DOCTOR' && (
+                  
                     <Link to={`/records/${record.id}/edit`} className="btn btn-sm btn-warning">
                       Edit
                     </Link>
-                  )}
+                  
                 </td>
               </tr>
             ))}
@@ -233,14 +231,14 @@ const PatientDetail = () => {
                   </table>
                 </div>
               ) : (
-          <div className="text-center py-3">
-        <p className="text-muted">No medical records found for this patient.</p>
-        {userRole !== 'DOCTOR' && (
-          <Link to={`/records/add?patient=${id}`} className="btn btn-primary">
-            Create First Medical Record
-          </Link>
-        )}
-      </div>
+                  <div className="text-center py-3">
+                <p className="text-muted">No medical records found for this patient.</p>
+                {userRole !== 'DOCTOR' && (
+                  <Link to={`/records/add?patient=${id}`} className="btn btn-primary">
+                    Create First Medical Record
+                  </Link>
+                )}
+              </div>
               )}
             </div>
           )}

@@ -64,7 +64,7 @@ const MedicalRecordList = () => {
    <div>
      <div className="flex justify-between items-center mb-6">
        <h2 className="text-2xl font-bold text-gray-800">Medical Records</h2>
-       {userRole !== 'DOCTOR' && (
+       {userRole === 'DOCTOR' && (
          <Link 
            to="/records/add"
            className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md inline-flex items-center"
@@ -150,7 +150,7 @@ const MedicalRecordList = () => {
                      <Link to={`/records/${record.id}`} className="text-indigo-600 hover:text-indigo-900 mr-4">
                        View
                      </Link>
-                     {userRole !== 'DOCTOR' && (
+                     {userRole === 'DOCTOR' && (
                        <Link to={`/records/${record.id}/edit`} className="text-amber-600 hover:text-amber-900">
                          Edit
                        </Link>
@@ -169,7 +169,7 @@ const MedicalRecordList = () => {
              <p className="mt-1 text-sm text-gray-500">
                {searchTerm ? 'Try adjusting your search terms.' : 'Get started by creating a new medical record.'}
              </p>
-             {userRole !== 'DOCTOR' && !searchTerm && (
+             {userRole === 'DOCTOR' && !searchTerm && (
                <div className="mt-6">
                  <Link
                    to="/records/add"
