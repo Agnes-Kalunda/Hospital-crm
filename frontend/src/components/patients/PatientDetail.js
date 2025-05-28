@@ -62,12 +62,13 @@ const PatientDetail = () => {
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h2>{patient.first_name} {patient.last_name}</h2>
         <div>
-          <Link to={`/patients/${id}/edit`} className="btn btn-warning me-2">
-            <i className="bi bi-pencil me-1"></i> Edit
-          </Link>
-          <Link to={`/appointments/add?patient=${id}`} className="btn btn-success me-2">
-            <i className="bi bi-calendar-plus me-1"></i> Schedule Appointment
-          </Link>
+          
+            <button 
+        className="btn btn-success me-2"
+        onClick={() => setActiveTab('appointments')}
+      >
+        <i className="bi bi-calendar-plus me-1"></i> View Appointments
+      </button>
           <button className="btn btn-danger" onClick={handleDelete}>
             <i className="bi bi-trash me-1"></i> Delete
           </button>
@@ -76,32 +77,7 @@ const PatientDetail = () => {
       
       <div className="card">
         <div className="card-header">
-          <ul className="nav nav-tabs card-header-tabs">
-            <li className="nav-item">
-              <button 
-                className={`nav-link ${activeTab === 'details' ? 'active' : ''}`}
-                onClick={() => setActiveTab('details')}
-              >
-                Details
-              </button>
-            </li>
-            <li className="nav-item">
-              <button 
-                className={`nav-link ${activeTab === 'appointments' ? 'active' : ''}`}
-                onClick={() => setActiveTab('appointments')}
-              >
-                Appointments
-              </button>
-            </li>
-            <li className="nav-item">
-              <button 
-                className={`nav-link ${activeTab === 'records' ? 'active' : ''}`}
-                onClick={() => setActiveTab('records')}
-              >
-                Medical Records
-              </button>
-            </li>
-          </ul>
+          
         </div>
         <div className="card-body">
           {activeTab === 'details' && (
@@ -162,12 +138,7 @@ const PatientDetail = () => {
           
           {activeTab === 'appointments' && (
             <div>
-              <div className="d-flex justify-content-between align-items-center mb-3">
-                <h5 className="mb-0">Appointments</h5>
-                <Link to={`/appointments/add?patient=${id}`} className="btn btn-sm btn-success">
-                  <i className="bi bi-calendar-plus me-1"></i> Add Appointment
-                </Link>
-              </div>
+            
               
               {appointments.length > 0 ? (
                 <div className="table-responsive">
@@ -177,8 +148,7 @@ const PatientDetail = () => {
                         <th>Doctor</th>
                         <th>Date & Time</th>
                         <th>Status</th>
-                        <th>Reason</th>
-                        <th>Actions</th>
+                        
                       </tr>
                     </thead>
                     <tbody>
@@ -198,12 +168,7 @@ const PatientDetail = () => {
                               {appointment.status_display}
                             </span>
                           </td>
-                          <td>{appointment.reason || 'N/A'}</td>
-                          <td>
-                            <Link to={`/appointments/${appointment.id}`} className="btn btn-sm btn-info me-2">
-                              <i className="bi bi-eye"></i>
-                            </Link>
-                          </td>
+                        
                         </tr>
                       ))}
                     </tbody>
