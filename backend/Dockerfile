@@ -1,13 +1,24 @@
-FROM python:3.8-slim
+FROM python:3.9-slim
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    postgresql-client \
+    gcc \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
+# Copy and install Python dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Copy project files
 COPY . .
 
-RUN python manage.py collectstatic --noinput
+# Create staticfiles directory
+RUN mkdir -p staticfiles
+
+# RUN python manage.py collectstatic --noinput
 
 EXPOSE 8000
 

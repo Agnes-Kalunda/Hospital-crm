@@ -56,22 +56,11 @@ const DoctorAvailability = () => {
    
    return weekDates;
  };
- 
  const getNextOccurrenceOfDay = (dayOfWeek) => {
-   const dayMapping = { 'MON': 1, 'TUE': 2, 'WED': 3, 'THU': 4, 'FRI': 5, 'SAT': 6, 'SUN': 0 };
-   const today = new Date();
-   const todayDayNum = today.getDay(); 
-   const targetDayNum = dayMapping[dayOfWeek];
-   
-   let daysToAdd = targetDayNum - todayDayNum;
-   if (daysToAdd <= 0) {
-     daysToAdd += 7;
-   }
-   
-   const nextDate = new Date(today);
-   nextDate.setDate(today.getDate() + daysToAdd);
-   return nextDate;
- };
+  const dayMapping = { 'MON': 0, 'TUE': 1, 'WED': 2, 'THU': 3, 'FRI': 4, 'SAT': 5, 'SUN': 6 };
+  const weekDates = getCurrentWeekDates();
+  return weekDates[dayMapping[dayOfWeek]];
+};
  
  useEffect(() => {
    const fetchDoctorData = async () => {
