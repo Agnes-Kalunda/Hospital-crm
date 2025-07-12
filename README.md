@@ -2,6 +2,7 @@
 
 This is a simple web application designed to manage doctor appointments, patient records, and medical information. The system allows staff to schedule appointments, track patient information, and manage doctor availability.
 
+
 ## Technologies Used
 
 *  **Backend**: Django 3.2 with Django REST Framework
@@ -9,6 +10,7 @@ This is a simple web application designed to manage doctor appointments, patient
 *   **Database**: postgres
 *    **API Documentation**: Swagger/OpenAPI via drf-yasg
 *   **Frontend**: React (with tailwind CSS)
+*   **Live Deployment**: AWS EC2
 
 ## Features
 
@@ -18,6 +20,23 @@ This is a simple web application designed to manage doctor appointments, patient
  *   Appointment booking with validation
  *   Medical records tracking
  *   Timezone-aware scheduling
+
+
+## Live links
+After containerization, the application was deployed using an AWS EC2 instance.The containerized application runs on a dedicated EC2 instance, providing reliable access to the hospital management system in a production environment.
+
+http://51.21.130.61   - Main app
+http://51.21.130.61/api/    - Api documentation
+http://51.21.130.61/admin/    - Django admin
+
+To test the main app as a doctor or staff, use the following registered credentials :
+
+Doctor
+username : doctor , doctorTwo || password : kalunda20
+
+Staff
+username : staffOne , staffTwo || password : kalunda20
+
 
 ## Running the Project Locally
 
